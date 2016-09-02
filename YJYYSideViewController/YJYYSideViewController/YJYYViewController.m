@@ -7,10 +7,11 @@
 //
 
 #import "YJYYViewController.h"
+#define topValue 64
+#define leftValue 150
+
 
 @interface YJYYViewController ()
-@property (assign,nonatomic)BOOL isScale;/**是否缩小*/
-
 
 @end
 
@@ -42,71 +43,51 @@
 }
 
 - (void)addGesture {
-//    UITapGestureRecognizer * tapGes = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tap:)];
+    UITapGestureRecognizer * tapGes = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tap:)];
     
     UIPanGestureRecognizer * panGes = [[UIPanGestureRecognizer alloc]initWithTarget:self action:@selector(pan:)];
     
-//    [self.view addGestureRecognizer:tapGes];
+    [self.view addGestureRecognizer:tapGes];
     [self.view addGestureRecognizer:panGes];
 }
 
 - (void)tap:(UITapGestureRecognizer *)tapGes {
     
     [UIView animateWithDuration:0.25 animations:^{
-        self.navigationController.view.frame = [UIScreen mainScreen].bounds;
+        self.navigationController.view.transform = CGAffineTransformIdentity;
     } completion:^(BOOL finished) {
-        self.isScale = NO;
     }];
 }
 
 - (void)pan:(UIPanGestureRecognizer *)panGes {
-    if (self.isScale) {
-        [UIView animateWithDuration:0.25 animations:^{
-            self.navigationController.view.frame = [UIScreen mainScreen].bounds;
-        } completion:^(BOOL finished) {
-            self.isScale = NO;
-        }];
-        return;
-    }
-//    self.isScale = YES;
-    CGPoint  tansP = [panGes translationInView:self.view];
-    NSLog(@"%@",NSStringFromCGPoint(tansP));
-    CGFloat  x = tansP.x;
-    if (tansP.x >= 0) {
-        x = 150;
-    }else if (tansP.x <= 0) {
-        x = 0;
-    }
-    if (x == 0) {
-        self.isScale = NO;
-    }
     
-    
-    [UIView animateWithDuration:0.25 animations:^{
-        self.navigationController.view.frame = CGRectMake(x, self.navigationController.view.frame.origin.y, self.navigationController.view.frame.size.width, self.navigationController.view.frame.size.height);
-//        self.navigationController.view.transform = CGAffineTransformMakeScale(0.9, 0.9);
-    } completion:^(BOOL finished) {
-        
-    }];
+    [self backbarbuttonDidClickEvent:nil];
 }
 
 
 /** 返回操作 */
 - (void)backbarbuttonDidClickEvent:(UIButton *)sender {
-    if (self.isScale) {
-        return;
-    }
+
     [UIView animateWithDuration:0.25 animations:^{
-        self.navigationController.view.frame = CGRectMake(150, 64, self.view.bounds.size.width, self.view.bounds.size.height - 128);
-    } completion:^(BOOL finished) {
-        self.isScale = YES;
+        // 缩放比例
+        CGFloat navH = [UIScreen mainScreen].bounds.size.height - 2 * topValue;
+        CGFloat scale = navH / [UIScreen mainScreen].bounds.size.height;
+        
+        // 菜单左边的间距
+        CGFloat leftMenuMargin = [UIScreen mainScreen].bounds.size.width * (1 - scale) * 0.5;
+        CGFloat translateX = leftValue - leftMenuMargin;
+        
+        CGFloat topMargin = [UIScreen mainScreen].bounds.size.height * (1 - scale) * 0.5;
+        CGFloat translateY = topValue - topMargin;
+        
+        // 缩放
+        CGAffineTransform scaleForm = CGAffineTransformMakeScale(scale, scale);
+        // 平移
+        CGAffineTransform translateForm = CGAffineTransformTranslate(scaleForm, translateX / scale, translateY / scale);
+        
+        self.navigationController.view.transform = translateForm;
+        
     }];
-}
-
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 @end

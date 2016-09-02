@@ -7,8 +7,15 @@
 //
 
 #import <UIKit/UIKit.h>
+@class YJYYSideView;
 
+@protocol YJYYLeftMenuDelegate <NSObject>
+@optional
+- (void)leftMenu:(YJYYSideView *)menu didSelectedButtonFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex;
+@end
 @interface YJYYSideView : UIView
+@property (nonatomic, weak) id<YJYYLeftMenuDelegate> delegate;
+
 
 
 @end

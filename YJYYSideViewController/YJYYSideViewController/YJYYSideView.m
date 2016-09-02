@@ -11,6 +11,7 @@
 @interface YJYYSideView ()
 @property (copy,nonatomic)NSArray * titles;/**<标题数组*/
 @property (copy,nonatomic)NSMutableArray * btnsArray;/**<按钮数组*/
+@property (nonatomic, weak) UIButton *selectedButton;
 
 @end
 
@@ -32,6 +33,7 @@
         [btn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         btn.backgroundColor = [UIColor greenColor];
         btn.tag = i;
+        [btn addTarget:self action:@selector(buttonClick:) forControlEvents:UIControlEventTouchUpInside];
         [self addSubview:btn];
         [self.btnsArray addObject:btn];
     }
@@ -58,6 +60,23 @@
         _titles = @[@"刚哥",@"佳哥",@"老司机",@"超哥",@"轩哥"];
     }
     return _titles;
+}
+
+#pragma mark - 私有方法
+/**
+ *  监听按钮点击
+ */
+- (void)buttonClick:(UIButton *)button
+{
+    // 0.通知代理
+    if ([self.delegate respondsToSelector:@selector(leftMenu:didSelectedButtonFromIndex:toIndex:)]) {
+        [self.delegate leftMenu:self didSelectedButtonFromIndex:self.selectedButton.tag toIndex:button.tag];
+    }
+    
+    // 1.控制按钮的状态
+    self.selectedButton.selected = NO;
+    button.selected = YES;
+    self.selectedButton = button;
 }
 
 @end
